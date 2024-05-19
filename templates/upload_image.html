@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Processing</title>
+    <style>
+        /*body {
+            font-family: Arial, sans-serif;
+            background-color: darkcyan;
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        /*.container {
+            background-color: rgb(179, 195, 218);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px; /* Increased width */
+            /*text-align: center;
+        }*/
+        h1 {
+            color: #333;
+            font-size: 2em; /* Increased font size */
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+            font-size: 1.2em; /* Increased font size */
+        }
+        input[type="file"],
+        select,
+        input[type="submit"] {
+            margin-top: 15px;
+            padding: 12px; /* Increased padding */
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1.1em; /* Increased font size */
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        /*.vm-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }*/
+        .vm {
+            text-align: center;
+        }
+        .vm img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .status {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .status-ready {
+            color: green;
+        }
+        .status-busy {
+            color: orange;
+        }
+        .status-down {
+            color: red;
+        }
+.container {
+    background-color: rgb(179, 195, 218);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+    margin-bottom: 20px; /* Add margin bottom to create space between containers */
+    margin-top: auto; /* Push container to the bottom */
+
+}
+
+.vm-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 20px; /* Add margin top to create space between containers */
+    margin-bottom: auto; /* Push container to the top */
+}
+
+/* Ensure no expansion occurs to the top */
+body, html {
+    font-family: Arial, sans-serif;
+    background-color: darkcyan;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+    </style>
+    <script>
+        function getStatuses() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('worker1').innerText = data.worker1;
+                    document.getElementById('worker1').className = 'status ' + 'status-' + data.worker1;
+                    document.getElementById('worker2').innerText = data.worker2;
+                    document.getElementById('worker2').className = 'status ' + 'status-' + data.worker2;
+                    document.getElementById('worker3').innerText = data.worker3;
+                    document.getElementById('worker3').className = 'status ' + 'status-' + data.worker3;
+                });
+        }
+
+        // Update statuses every 300 milliseconds
+        setInterval(getStatuses, 300);
+
+        // Initial call to get statuses
+        getStatuses();
+
+        function addOperationSelect(index) {
+            const operationsContainer = document.getElementById('operations-container');
+            const newDiv = document.createElement('div');
+            newDiv.innerHTML = `
+                <label for="operation_${index}">Select Operation for Image ${index + 1}:</label>
+                <select id="operation_${index}" name="operation_${index}">
+                    <option value="Edge Detection">Edge Detection</option>
+                    <option value="Color Inversion">Color Inversion</option>
+                    <option value="Rotate">Rotate</option>
+                    <option value="Blur">Blur</option>
+                    <option value="Grayscale">Grayscale</option>
+                </select>
+            `;
+            operationsContainer.appendChild(newDiv);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('image').addEventListener('change', (event) => {
+                const files = event.target.files;
+                const operationsContainer = document.getElementById('operations-container');
+                operationsContainer.innerHTML = ''; // Clear existing selects
+                for (let i = 0; i < files.length; i++) {
+                    addOperationSelect(i);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Images</h1>
+        <form method="post" action="/process_image" enctype="multipart/form-data">
+            <label for="image">Select Images:</label>
+            <input type="file" id="image" name="images" multiple required>
+            <div id="operations-container">
+                <!-- Operation selects will be added here -->
+            </div>
+            <input type="submit" value="Process Images">
+        </form>
+    </div>
+
+    <div class="container">
+        <h1>Virtual Machines Status</h1>
+        <div class="vm-container">
+            <div class="vm">
+                <div class="vm-name">Worker 1</div>
+                <br>
+                <img src="{{ vmimg }}" alt="Worker 1">
+                <br>
+                <div class="status status-down" id="worker1">Down</div>
+            </div>
+            <div class="vm">
+                <div class="vm-name">Worker 2</div>
+                <br>
+                <img src="{{ vmimg }}" alt="Worker 2">
+                <br>
+                <div class="status status-down" id="worker2">Down</div>
+            </div>
+            <div class="vm">
+                <div class="vm-name">Worker 3</div>
+                <br>
+                <img src="{{ vmimg }}" alt="Worker 3">
+                <br>
+                <div class="status status-down" id="worker3">Down</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

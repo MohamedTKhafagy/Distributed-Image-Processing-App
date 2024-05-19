@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processed Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: darkcyan;
+            display: flex;
+            background-repeat: no-repeat;
+            background-size: cover;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: rgb(179, 195, 218);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 80%;
+            width: 500px;
+            overflow: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .image-item {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .image-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .image-item a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .image-item a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Processed Images</h1>
+        <div class="images-container">
+            {% for image in processed_images %}
+        <div class="image-item">
+            <h3>{{ image.name }}</h3>
+            <img src="data:image/jpeg;base64,{{ image.data }}" alt="{{ image.name }}">
+            <a href="data:image/jpeg;base64,{{ image.data }}" download="{{ image.name }}">Download {{ image.name }}</a>
+        </div>
+        <br>
+    {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
